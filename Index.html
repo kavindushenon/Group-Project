@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Idea Board</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        header { text-align: center; margin-bottom: 2rem; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 2rem; }
+        select, input, button { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #007bff; color: white; cursor: pointer; border: none; }
+        button:hover { background-color: #0056b3; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; border-bottom: 1px solid #eee; }
+        footer { margin-top: 2rem; font-size: 0.9rem; color: #666; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Group Idea Board</h1>
+    </header>
+
+    <div class="input-group">
+        <select id="userName">
+            <option value="">Select your name...</option>
+            <option value="Nimal">Nimal</option>
+            <option value="Sara">Sara</option>
+            <option value="Alex">Alex</option>
+        </select>
+        <input type="text" id="ideaText" placeholder="Enter your idea here...">
+        <button onclick="addIdea()">Add Idea</button>
+    </div>
+
+    <ul id="ideaList">
+        <li>Build a study planner - suggested by Nimal</li>
+        <li>Start a podcast - suggested by Sara</li>
+        <li>Organize a coding workshop - suggested by Alex</li>
+    </ul>
+
+    <footer id="footer">
+        Total ideas: <span id="count">3</span>
+    </footer>
+
+    <script>
+        function addIdea() {
+            const name = document.getElementById('userName').value;
+            const idea = document.getElementById('ideaText').value;
+            if (name && idea) {
+                const ul = document.getElementById('ideaList');
+                const li = document.createElement('li');
+                li.textContent = `${idea} - suggested by ${name}`;
+                ul.appendChild(li);
+                
+                // Update counter
+                const count = document.querySelectorAll('li').length;
+                document.getElementById('count').textContent = count;
+                
+                // Reset input
+                document.getElementById('ideaText').value = '';
+            } else {
+                alert("Please select a name and enter an idea.");
+            }
+        }
+    </script>
+</body>
+</html>
