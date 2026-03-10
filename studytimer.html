@@ -4,32 +4,41 @@
     <title>Student Toolkit</title>
 
     <style>
-      /* PAGE STYLE */
+      /* GLOBAL */
 
       body {
-        font-family: Arial;
+        font-family: "Segoe UI", sans-serif;
         margin: 0;
+        background: #f2f5f9;
       }
 
       /* NAVBAR */
 
       .navbar {
-        background: #333;
+        background: linear-gradient(90deg, #4b6cb7, #182848);
         color: white;
         display: flex;
         justify-content: space-between;
-        padding: 15px;
+        align-items: center;
+        padding: 15px 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
 
       .navbar ul {
         list-style: none;
         display: flex;
-        gap: 20px;
+        gap: 25px;
         margin: 0;
+        padding: 0;
       }
 
       .navbar li {
         cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .navbar li:hover {
+        opacity: 0.7;
       }
 
       /* LAYOUT */
@@ -41,40 +50,67 @@
       /* SIDEBAR */
 
       .sidebar {
-        width: 250px;
-        background: #f4f4f4;
-        padding: 20px;
+        width: 260px;
+        background: white;
+        padding: 25px;
         height: 100vh;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar h3 {
+        margin-top: 0;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
       }
 
       .sidebar ul {
         padding-left: 15px;
+        line-height: 1.8;
       }
 
       /* MAIN AREA */
 
       .main {
         flex: 1;
-        padding: 40px;
+        padding: 50px;
       }
 
-      /* TIMER */
+      /* TIMER CARD */
 
       .timer {
+        background: white;
+        padding: 40px;
+        max-width: 400px;
+        margin: auto;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         text-align: center;
-        margin-top: 40px;
       }
+
+      /* TIMER TEXT */
 
       #time {
         font-size: 60px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        color: #182848;
       }
 
+      /* BUTTONS */
+
       button {
-        padding: 10px 20px;
+        padding: 12px 25px;
         margin: 10px;
         font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        background: #4b6cb7;
+        color: white;
         cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: #182848;
       }
     </style>
   </head>
@@ -100,9 +136,9 @@
         <h3>Upcoming Events</h3>
 
         <ul>
-          <li>Math Exam - Monday</li>
-          <li>Assignment Deadline - Friday</li>
-          <li>Study Group - Saturday</li>
+          <li>📘 Math Exam - Monday</li>
+          <li>📝 Assignment Deadline - Friday</li>
+          <li>👥 Study Group - Saturday</li>
         </ul>
       </div>
 
@@ -115,7 +151,6 @@
           <h1 id="time">25:00</h1>
 
           <button onclick="startTimer()">Start</button>
-
           <button onclick="resetTimer()">Reset</button>
         </div>
       </div>
