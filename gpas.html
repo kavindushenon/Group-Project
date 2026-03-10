@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Calculator</title>
+    <style>
+        :root {
+            --primary: #800000; /* Maroon */
+            --primary-hover: #600000;
+            --accent: #d4af37; /* Gold */
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --error: #ef4444;
+            --nav-btn-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --primary: #a52a2a;
+            --primary-hover: #800000;
+            --accent: #ffd700;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-light: #94a3b8;
+            --border: #334155;
+            --nav-btn-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 1.5rem 0;
+            border-bottom: 2px solid var(--accent);
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+
+        .theme-toggle {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover { border-color: var(--accent); }
+
+        nav {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+            background: var(--nav-btn-bg);
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover { color: var(--primary); border-color: var(--accent); }
+
+        .nav-btn.active {
+            background-color: var(--primary);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .courses-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+
+        .course-row {
+            display: grid;
+            grid-template-columns: 30px 1fr 100px 100px 40px;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        input {
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 0.4rem;
+            font-size: 0.9rem;
+            width: 100%;
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+
+        .remove-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 0.4rem;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .remove-btn:hover { border-color: var(--error); color: var(--error); }
+
+        .actions { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-add { background: var(--bg); color: var(--primary); border: 1px dashed var(--primary); }
+        .btn-add:hover { background: rgba(128, 0, 0, 0.1); }
+
+        .btn-calculate { background: var(--primary); color: var(--accent); border: 1px solid var(--accent); }
+        .btn-calculate:hover { background: var(--primary-hover); }
+
+        .btn-reset { background: var(--bg); color: var(--text-light); border: 1px solid var(--border); }
+        .btn-reset:hover { border-color: var(--accent); color: var(--text); }
+
+        .result-section {
+            display: none;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .result-section.visible { display: block; }
+
+        .gpa-display { margin-bottom: 2rem; }
+
+        .gpa-number { font-size: 4rem; font-weight: 800; color: var(--primary); display: block; }
+
+        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+        .stat-box { padding: 1rem; background: var(--bg); border-radius: 0.5rem; }
+
+        .stat-label { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--text); display: block; }
+
+        .error-msg { color: var(--error); font-size: 0.875rem; margin-bottom: 1rem; display: none; }
+        .error-msg.visible { display: block; }
+
+        .legend { margin-top: 2rem; font-size: 0.8rem; color: var(--text-light); text-align: left; }
+        .legend-title { font-weight: 700; margin-bottom: 0.5rem; display: block; color: var(--primary); }
+        .legend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; }
+
+        @media (max-width: 600px) {
+            .course-row { grid-template-columns: 1fr 1fr; }
+            .course-row span:first-child, .course-row .remove-btn { grid-column: span 2; }
+            .result-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Student Toolkit</h1>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <svg id="sunIcon" style="display:none" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg id="moonIcon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <nav>
+            <a href="Index.html" class="nav-btn">Idea Board</a>
+            <a href="gpas.html" class="nav-btn active">GPA Calculator</a>
+            <a href="studytimer.html" class="nav-btn">Study Timer</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 style="color: var(--primary);">GPA Calculator</h2>
+        <p style="color: var(--text-light); margin-bottom: 2rem;">Enter your courses, credits, and letter grades (e.g., A, B+).</p>
+
+        <div class="courses-list" id="coursesList"></div>
+
+        <div class="error-msg" id="errorMsg"></div>
+
+        <div class="actions">
+            <button class="btn btn-add" onclick="addCourse()">+ Add Course</button>
+            <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+            <button class="btn btn-calculate" onclick="calculateGPA()">Calculate GPA</button>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="gpa-display">
+                <span class="stat-label">Cumulative GPA</span>
+                <span class="gpa-number" id="gpaNumber">0.00</span>
+            </div>
+
+            <div class="result-grid">
+                <div class="stat-box">
+                    <span class="stat-label">Total Credits</span>
+                    <span class="stat-value" id="totalCredits">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Quality Points</span>
+                    <span class="stat-value" id="qualityPoints">0.00</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Courses</span>
+                    <span class="stat-value" id="courseCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <span class="legend-title">Grading Scale Reference:</span>
+            <div class="legend-grid" id="legendGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        // Theme logic
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+        }
+
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        setTheme(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            setTheme(theme);
+        });
+
+        const GRADE_SCALE = {
+            'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+            'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+            'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+            'D+': 1.3, 'D': 1.0, 'D-': 0.7,
+            'F': 0.0
+        };
+
+        let rowId = 0;
+
+        function buildLegend() {
+            const grid = document.getElementById('legendGrid');
+            grid.innerHTML = Object.entries(GRADE_SCALE).map(([grade, pts]) => 
+                `<span><strong>${grade}</strong>: ${pts.toFixed(1)}</span>`
+            ).join('');
+        }
+
+        function addCourse(name = '', credits = '', grade = '') {
+            const list = document.getElementById('coursesList');
+            const id = ++rowId;
+            const count = list.children.length + 1;
+
+            const row = document.createElement('div');
+            row.className = 'course-row';
+            row.id = `row-${id}`;
+
+            row.innerHTML = `
+                <span style="color: var(--text-light); font-weight: 600;">${count}</span>
+                <input type="text" placeholder="Course name" value="${name}" />
+                <input type="text" placeholder="Credits" value="${credits}" />
+                <input type="text" placeholder="Grade (A, B...)" value="${grade}" />
+                <button class="remove-btn" onclick="removeCourse('row-${id}')">×</button>
+            `;
+
+            list.appendChild(row);
+            reNumber();
+        }
+
+        function removeCourse(id) {
+            const row = document.getElementById(id);
+            if (row) { row.remove(); reNumber(); }
+        }
+
+        function reNumber() {
+            document.querySelectorAll('.course-row span:first-child').forEach((el, i) => {
+                el.textContent = i + 1;
+            });
+        }
+
+        function calculateGPA() {
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.classList.remove('visible');
+            
+            const rows = document.querySelectorAll('.course-row');
+            if (!rows.length) { 
+                errorEl.textContent = 'Please add at least one course.';
+                errorEl.classList.add('visible');
+                return; 
+            }
+
+            let totalCredits = 0, totalPoints = 0;
+            let hasError = false;
+
+            rows.forEach((row, i) => {
+                const inputs = row.querySelectorAll('input');
+                const credits = parseFloat(inputs[1].value);
+                const gradeTyped = inputs[2].value.trim().toUpperCase();
+                const points = GRADE_SCALE[gradeTyped];
+
+                if (isNaN(credits) || credits <= 0) {
+                    errorEl.textContent = `Please enter valid credits for row ${i+1}.`;
+                    errorEl.classList.add('visible');
+                    hasError = true;
+                    return;
+                }
+
+                if (points === undefined) {
+                    errorEl.textContent = `Invalid grade "${gradeTyped}" in row ${i+1}. Use A, B+, etc.`;
+                    errorEl.classList.add('visible');
+                    hasError = true;
+                    return;
+                }
+
+                totalCredits += credits;
+                totalPoints += credits * points;
+            });
+
+            if (hasError) return;
+
+            const gpa = totalPoints / totalCredits;
+            document.getElementById('gpaNumber').textContent = gpa.toFixed(2);
+            document.getElementById('totalCredits').textContent = totalCredits;
+            document.getElementById('qualityPoints').textContent = totalPoints.toFixed(2);
+            document.getElementById('courseCount').textContent = rows.length;
+            
+            document.getElementById('resultSection').classList.add('visible');
+        }
+
+        function resetAll() {
+            document.getElementById('coursesList').innerHTML = '';
+            document.getElementById('resultSection').classList.remove('visible');
+            addCourse('', '', '');
+        }
+
+        buildLegend();
+        addCourse('Math', '3', 'A');
+        addCourse('Physics', '4', 'B+');
+    </script>
+</body>
+</html>

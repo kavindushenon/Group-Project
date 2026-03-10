@@ -5,45 +5,225 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Group Idea Board</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
-        header { text-align: center; margin-bottom: 2rem; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 2rem; }
-        select, input, button { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background-color: #007bff; color: white; cursor: pointer; border: none; }
-        button:hover { background-color: #0056b3; }
+        :root {
+            --primary: #800000; /* Maroon */
+            --primary-hover: #600000;
+            --accent: #d4af37; /* Gold */
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --nav-btn-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --primary: #a52a2a;
+            --primary-hover: #800000;
+            --accent: #ffd700;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-light: #94a3b8;
+            --border: #334155;
+            --nav-btn-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 1.5rem 0;
+            border-bottom: 2px solid var(--accent); /* Gold border */
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+
+        .theme-toggle {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+
+        nav {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+            background: var(--nav-btn-bg);
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover {
+            color: var(--primary);
+            border-color: var(--accent);
+        }
+
+        .nav-btn.active {
+            background-color: var(--primary);
+            color: var(--accent); /* Gold text on Maroon */
+            border-color: var(--accent);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        select, input, button {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+
+        button.primary-btn {
+            background-color: var(--primary);
+            color: var(--accent);
+            cursor: pointer;
+            border: 1px solid var(--accent);
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button.primary-btn:hover { background-color: var(--primary-hover); }
+
         ul { list-style: none; padding: 0; }
-        li { padding: 10px; border-bottom: 1px solid #eee; }
-        footer { margin-top: 2rem; font-size: 0.9rem; color: #666; text-align: center; }
+        li {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+        li:last-child { border-bottom: none; }
+
+        footer {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Group Idea Board</h1>
+        <h1>Student Toolkit</h1>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <svg id="sunIcon" style="display:none" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg id="moonIcon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <nav>
+            <a href="Index.html" class="nav-btn active">Idea Board</a>
+            <a href="gpas.html" class="nav-btn">GPA Calculator</a>
+            <a href="studytimer.html" class="nav-btn">Study Timer</a>
+        </nav>
     </header>
 
-    <div class="input-group">
-        <select id="userName">
-            <option value="">Select your name...</option>
-            <option value="Nimal">Nimal</option>
-            <option value="Sara">Sara</option>
-            <option value="Alex">Alex</option>
-        </select>
-        <input type="text" id="ideaText" placeholder="Enter your idea here...">
-        <button onclick="addIdea()">Add Idea</button>
+    <div class="container">
+        <h2 style="color: var(--primary);">Group Idea Board</h2>
+        <div class="input-group">
+            <select id="userName">
+                <option value="">Select your name...</option>
+                <option value="Nirma">Nirma</option>
+                <option value="Kavindu">Kavindu</option>
+                <option value="Venuja">Venuja</option>
+            </select>
+            <input type="text" id="ideaText" placeholder="Enter your idea here...">
+            <button class="primary-btn" onclick="addIdea()">Add Idea</button>
+        </div>
+
+        <ul id="ideaList">
+            <li>Build a study planner - suggested by Nimal</li>
+            <li>Start a podcast - suggested by Sara</li>
+            <li>Organize a coding workshop - suggested by Alex</li>
+        </ul>
+
+        <footer id="footer">
+            Total ideas: <span id="count">3</span>
+        </footer>
     </div>
 
-    <ul id="ideaList">
-        <li>Build a study planner - suggested by Nimal</li>
-        <li>Start a podcast - suggested by Sara</li>
-        <li>Organize a coding workshop - suggested by Alex</li>
-    </ul>
-
-    <footer id="footer">
-        Total ideas: <span id="count">3</span>
-    </footer>
-
     <script>
+        // Theme logic
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+        }
+
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        setTheme(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            setTheme(theme);
+        });
+
         function addIdea() {
             const name = document.getElementById('userName').value;
             const idea = document.getElementById('ideaText').value;
@@ -53,11 +233,8 @@
                 li.textContent = `${idea} - suggested by ${name}`;
                 ul.appendChild(li);
                 
-                // Update counter
-                const count = document.querySelectorAll('li').length;
+                const count = document.querySelectorAll('#ideaList li').length;
                 document.getElementById('count').textContent = count;
-                
-                // Reset input
                 document.getElementById('ideaText').value = '';
             } else {
                 alert("Please select a name and enter an idea.");

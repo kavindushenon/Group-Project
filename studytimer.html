@@ -1,196 +1,255 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Student Toolkit</title>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Timer</title>
     <style>
-      /* GLOBAL */
+        :root {
+            --primary: #800000; /* Maroon */
+            --primary-hover: #600000;
+            --accent: #d4af37; /* Gold */
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --nav-btn-bg: #ffffff;
+        }
 
-      body {
-        font-family: "Segoe UI", sans-serif;
-        margin: 0;
-        background: #f2f5f9;
-      }
+        [data-theme="dark"] {
+            --primary: #a52a2a;
+            --primary-hover: #800000;
+            --accent: #ffd700;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-light: #94a3b8;
+            --border: #334155;
+            --nav-btn-bg: #1e293b;
+        }
 
-      /* NAVBAR */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-      .navbar {
-        background: linear-gradient(90deg, #4b6cb7, #182848);
-        color: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px 30px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      }
+        header {
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 1.5rem 0;
+            border-bottom: 2px solid var(--accent);
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
 
-      .navbar ul {
-        list-style: none;
-        display: flex;
-        gap: 25px;
-        margin: 0;
-        padding: 0;
-      }
+        h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
 
-      .navbar li {
-        cursor: pointer;
-        transition: 0.3s;
-      }
+        .theme-toggle {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-      .navbar li:hover {
-        opacity: 0.7;
-      }
+        .theme-toggle:hover { border-color: var(--accent); }
 
-      /* LAYOUT */
+        nav {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
 
-      .container {
-        display: flex;
-      }
+        .nav-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+            background: var(--nav-btn-bg);
+            font-size: 0.9rem;
+        }
 
-      /* SIDEBAR */
+        .nav-btn:hover { color: var(--primary); border-color: var(--accent); }
 
-      .sidebar {
-        width: 260px;
-        background: white;
-        padding: 25px;
-        height: 100vh;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-      }
+        .nav-btn.active {
+            background-color: var(--primary);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
 
-      .sidebar h3 {
-        margin-top: 0;
-        border-bottom: 2px solid #eee;
-        padding-bottom: 10px;
-      }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 3rem 2rem;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            text-align: center;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
 
-      .sidebar ul {
-        padding-left: 15px;
-        line-height: 1.8;
-      }
+        #time {
+            font-size: 5rem;
+            font-weight: 800;
+            color: var(--text);
+            margin: 2rem 0;
+            font-variant-numeric: tabular-nums;
+        }
 
-      /* MAIN AREA */
+        .controls { display: flex; gap: 1rem; justify-content: center; }
 
-      .main {
-        flex: 1;
-        padding: 50px;
-      }
+        button.btn {
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
 
-      /* TIMER CARD */
+        .btn-start { background-color: var(--primary); color: var(--accent); border: 1px solid var(--accent); }
+        .btn-start:hover { background-color: var(--primary-hover); }
 
-      .timer {
-        background: white;
-        padding: 40px;
-        max-width: 400px;
-        margin: auto;
-        border-radius: 10px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        text-align: center;
-      }
+        .btn-reset { background-color: var(--bg); color: var(--text-light); border: 1px solid var(--border); }
+        .btn-reset:hover { border-color: var(--accent); color: var(--text); }
 
-      /* TIMER TEXT */
+        .info {
+            margin-top: 3rem;
+            text-align: left;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
 
-      #time {
-        font-size: 60px;
-        margin-bottom: 25px;
-        color: #182848;
-      }
-
-      /* BUTTONS */
-
-      button {
-        padding: 12px 25px;
-        margin: 10px;
-        font-size: 16px;
-        border: none;
-        border-radius: 6px;
-        background: #4b6cb7;
-        color: white;
-        cursor: pointer;
-        transition: 0.3s;
-      }
-
-      button:hover {
-        background: #182848;
-      }
+        .info h3 { margin-top: 0; color: var(--primary); }
+        .info ul { padding-left: 1.25rem; color: var(--text-light); line-height: 1.6; }
     </style>
-  </head>
+</head>
+<body>
 
-  <body>
-    <!-- NAVBAR -->
-
-    <div class="navbar">
-      <h2>Student Toolkit</h2>
-
-      <ul>
-        <li>Dashboard</li>
-        <li>Tools</li>
-        <li>Resources</li>
-        <li>Settings</li>
-      </ul>
-    </div>
+    <header>
+        <h1>Student Toolkit</h1>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <svg id="sunIcon" style="display:none" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg id="moonIcon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <nav>
+            <a href="Index.html" class="nav-btn">Idea Board</a>
+            <a href="gpas.html" class="nav-btn">GPA Calculator</a>
+            <a href="studytimer.html" class="nav-btn active">Study Timer</a>
+        </nav>
+    </header>
 
     <div class="container">
-      <!-- SIDEBAR -->
+        <h2 style="color: var(--primary);">Pomodoro Timer</h2>
+        <p style="color: var(--text-light);">Focus on your work for 25 minutes.</p>
 
-      <div class="sidebar">
-        <h3>Upcoming Events</h3>
+        <div id="time">25:00</div>
 
-        <ul>
-          <li>📘 Math Exam - Monday</li>
-          <li>📝 Assignment Deadline - Friday</li>
-          <li>👥 Study Group - Saturday</li>
-        </ul>
-      </div>
-
-      <!-- MAIN DASHBOARD -->
-
-      <div class="main">
-        <h2>Pomodoro Study Timer</h2>
-
-        <div class="timer">
-          <h1 id="time">25:00</h1>
-
-          <button onclick="startTimer()">Start</button>
-          <button onclick="resetTimer()">Reset</button>
+        <div class="controls">
+            <button class="btn btn-start" id="startBtn" onclick="toggleTimer()">Start</button>
+            <button class="btn btn-reset" onclick="resetTimer()">Reset</button>
         </div>
-      </div>
+
+        <div class="info">
+            <h3>Upcoming Events</h3>
+            <ul>
+                <li>📘 Math Exam - Monday</li>
+                <li>📝 Assignment Deadline - Friday</li>
+                <li>👥 Study Group - Saturday</li>
+            </ul>
+        </div>
     </div>
 
     <script>
-      let time = 1500;
-      let timer;
+        // Theme logic
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
 
-      function updateDisplay() {
-        let minutes = Math.floor(time / 60);
-        let seconds = time % 60;
-
-        if (seconds < 10) {
-          seconds = "0" + seconds;
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
         }
 
-        document.getElementById("time").innerText = minutes + ":" + seconds;
-      }
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        setTheme(currentTheme);
 
-      function startTimer() {
-        timer = setInterval(function () {
-          time--;
+        themeToggle.addEventListener('click', () => {
+            const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            setTheme(theme);
+        });
 
-          updateDisplay();
+        let timeLeft = 1500;
+        let timer = null;
+        let isRunning = false;
 
-          if (time <= 0) {
+        function updateDisplay() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById("time").innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                document.getElementById("startBtn").innerText = "Start";
+            } else {
+                timer = setInterval(function () {
+                    timeLeft--;
+                    updateDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        alert("Pomodoro session finished!");
+                        resetTimer();
+                    }
+                }, 1000);
+                document.getElementById("startBtn").innerText = "Pause";
+            }
+            isRunning = !isRunning;
+        }
+
+        function resetTimer() {
             clearInterval(timer);
-            alert("Pomodoro session finished!");
-          }
-        }, 1000);
-      }
+            timeLeft = 1500;
+            isRunning = false;
+            document.getElementById("startBtn").innerText = "Start";
+            updateDisplay();
+        }
 
-      function resetTimer() {
-        clearInterval(timer);
-        time = 1500;
         updateDisplay();
-      }
-
-      updateDisplay();
     </script>
-  </body>
+</body>
 </html>
