@@ -146,7 +146,6 @@
     }
 
     input[type="text"],
-    input[type="number"],
     select {
       background: rgba(46,6,9,0.6);
       border: 1px solid rgba(201,168,76,0.22);
@@ -160,16 +159,33 @@
       outline: none;
     }
 
-    input[type="text"]::placeholder,
-    input[type="number"]::placeholder { color: rgba(245,228,168,0.25); }
+    input[type="text"]::placeholder { color: rgba(245,228,168,0.25); }
 
-    input:focus, select:focus {
+    input[type="text"]:focus, select:focus {
       border-color: var(--gold);
       background: rgba(107,15,26,0.5);
       box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
     }
 
-    select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
+    /* Credits text box — numbers only styling hint */
+    .credits-input {
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    .credits-input.invalid {
+      border-color: #e05555 !important;
+      box-shadow: 0 0 0 3px rgba(224,85,85,0.15) !important;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 34px;
+    }
 
     select option { background: var(--maroon-dark); color: var(--text-light); }
 
@@ -377,9 +393,7 @@
     .error-msg.visible { display: block; }
 
     /* ── Scale legend ── */
-    .scale-legend {
-      margin-top: 22px;
-    }
+    .scale-legend { margin-top: 22px; }
 
     .scale-title {
       font-size: 0.68rem;
@@ -551,6 +565,28 @@
     ).join('');
   }
 
+  // Restrict credits text box to numbers and a single decimal point only
+  function enforceNumericOnly(e) {
+    const input = e.target;
+    // Remove any character that's not a digit or a dot
+    let val = input.value.replace(/[^0-9.]/g, '');
+    // Allow only one decimal point
+    const parts = val.split('.');
+    if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+    // Prevent leading dot (turn ".5" into "0.5")
+    if (val.startsWith('.')) val = '0' + val;
+    // Limit to 2 decimal places
+    if (parts[1] && parts[1].length > 2) val = parts[0] + '.' + parts[1].slice(0, 2);
+    input.value = val;
+    // Live validity styling
+    const num = parseFloat(val);
+    if (val === '' || isNaN(num) || num <= 0) {
+      input.classList.add('invalid');
+    } else {
+      input.classList.remove('invalid');
+    }
+  }
+
   function addCourse(name = '', credits = '', grade = '') {
     const list = document.getElementById('coursesList');
     const id = ++rowId;
@@ -569,13 +605,42 @@
       <span class="row-num">${count}</span>
       <input type="text" placeholder="Course name (optional)" value="${name}" />
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <input type="number" min="0.5" max="6" step="0.5" placeholder="Credits" value="${credits}" />
+        <input
+          type="text"
+          inputmode="decimal"
+          class="credits-input"
+          placeholder="Credits"
+          value="${credits}"
+          maxlength="5"
+        />
         <select>${gradeOptions}</select>
       </div>
       <button class="remove-btn" onclick="removeCourse('row-${id}')" title="Remove">×</button>
     `;
 
     list.appendChild(row);
+
+    // Attach the numeric-only enforcer to the credits input
+    const creditsInput = row.querySelector('.credits-input');
+    creditsInput.addEventListener('input', enforceNumericOnly);
+    // Also block non-numeric keypresses (letters, symbols)
+    creditsInput.addEventListener('keydown', (e) => {
+      const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End','.'];
+      if (!allowed.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+      }
+      // Block second dot
+      if (e.key === '.' && e.target.value.includes('.')) e.preventDefault();
+    });
+    // Block paste of non-numeric content
+    creditsInput.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text');
+      const cleaned = pasted.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+      e.target.value = cleaned;
+      e.target.dispatchEvent(new Event('input'));
+    });
+
     reNumber();
   }
 
@@ -614,15 +679,15 @@
     let hasError = false;
 
     rows.forEach((row, i) => {
-      const creditsInput = row.querySelector('input[type="number"]');
+      const creditsInput = row.querySelector('.credits-input');
       const gradeSelect  = row.querySelector('select');
       const credits = parseFloat(creditsInput.value);
       const points  = parseFloat(gradeSelect.value);
 
-      creditsInput.style.borderColor = '';
+      creditsInput.classList.remove('invalid');
 
-      if (isNaN(credits) || credits <= 0) {
-        creditsInput.style.borderColor = '#e05555';
+      if (!creditsInput.value.trim() || isNaN(credits) || credits <= 0) {
+        creditsInput.classList.add('invalid');
         showError(`Row ${i + 1}: Please enter valid credit hours (e.g. 3).`);
         hasError = true;
         return;
@@ -638,10 +703,9 @@
 
     const gpa = totalPoints / totalCredits;
 
-    // Animate result
     const section = document.getElementById('resultSection');
     section.classList.remove('visible');
-    void section.offsetWidth; // reflow
+    void section.offsetWidth;
     section.classList.add('visible');
 
     animateNumber('gpaNumber', gpa, 2);
@@ -674,9 +738,9 @@
     document.getElementById('resultSection').classList.remove('visible');
     clearError();
     rowId = 0;
-    addCourse('', 3, '');
-    addCourse('', 3, '');
-    addCourse('', 3, '');
+    addCourse('', '', '');
+    addCourse('', '', '');
+    addCourse('', '', '');
   }
 
   // Init
