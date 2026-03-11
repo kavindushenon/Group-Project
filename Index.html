@@ -143,13 +143,43 @@
 
         button.primary-btn:hover { background-color: var(--primary-hover); }
 
-        ul { list-style: none; padding: 0; }
         li {
             padding: 1rem;
             border-bottom: 1px solid var(--border);
             color: var(--text);
+            word-break: break-word;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         li:last-child { border-bottom: none; }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .delete-btn:hover {
+            color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .delete-btn {
+                display: block;
+            }
+        }
+
+        @media (min-width: 769px) {
+            li:hover .delete-btn {
+                display: block;
+            }
+        }
 
         footer {
             margin-top: 1rem;
@@ -226,11 +256,18 @@
 
         function addIdea() {
             const name = document.getElementById('userName').value;
-            const idea = document.getElementById('ideaText').value;
+            let idea = document.getElementById('ideaText').value.trim();
             if (name && idea) {
+                // Check for duplicates
+                const existingIdeas = Array.from(document.querySelectorAll('#ideaList li')).map(li => li.textContent.replace(' ×', '').trim());
+                if (existingIdeas.includes(`${idea} - suggested by ${name}`)) {
+                    alert("This idea has already been suggested by you.");
+                    return;
+                }
+                
                 const ul = document.getElementById('ideaList');
                 const li = document.createElement('li');
-                li.textContent = `${idea} - suggested by ${name}`;
+                li.innerHTML = `${idea} - suggested by ${name} <button class="delete-btn" onclick="deleteIdea(this)">×</button>`;
                 ul.appendChild(li);
                 
                 const count = document.querySelectorAll('#ideaList li').length;
@@ -238,6 +275,14 @@
                 document.getElementById('ideaText').value = '';
             } else {
                 alert("Please select a name and enter an idea.");
+            }
+        }
+
+        function deleteIdea(button) {
+            if (confirm("Are you sure you want to delete this idea?")) {
+                button.parentElement.remove();
+                const count = document.querySelectorAll('#ideaList li').length;
+                document.getElementById('count').textContent = count;
             }
         }
     </script>
